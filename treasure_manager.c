@@ -27,21 +27,15 @@ void add(char h[]){
 	printf("Enter Cluetext: "); scanf("%s", t.Cluetext);
 	printf("Enter value: "); scanf("%d", &t.value);
 	
+	time(&t.rawtime);
+	
 	if(chdir(path) == 0){
 		char filename[255] = "";
 		strcat(filename, h);
 		strcat(filename, ".b");
-		FILE *file = fopen(filename, "wb");
+		FILE *file = fopen(filename, "a");
 		if(file){
-			int n1 = strlen(t.Username);
-			int n2 = strlen(t.Cluetext);
-			
-			fwrite(&t.TreasureID, sizeof(int), 1, file);
-			fwrite(t.Username, n1 * sizeof(char), 1, file);
-			fwrite(&t.latitude, sizeof(float), 1, file);
-			fwrite(&t.longitude, sizeof(float), 1, file);
-			fwrite(t.Cluetext, n2 * sizeof(char), 1, file);
-			fwrite(&t.value, sizeof(int), 1, file);
+			fwrite(&t, sizeof(Treasure), 1, file);
 		}
 		else{
 			printf("Couldn't open file");
@@ -65,30 +59,14 @@ void list(char h[]){
 		strcat(filename, ".b");
 		FILE *file = fopen(filename, "rb");
 		if(file){
-			int TreasureID, value;
-			char Username[255], Cluetext[255];
-			float latitude, longitude;
-			fread(&TreasureID, sizeof(int), 1, file);
-			char c;
-			int k = 0;
-			fread(&c, sizeof(char), 1, file);
-			while(c != ' ' && k < 255){
-				Username[k++] = c;
-				fread(&c, sizeof(char), 1, file);
+			Treasure t;
+			int size = 0;
+			while(fread(&t, sizeof(Treasure), 1, file) == 1){
+				size += sizeof(Treasure);
+				printf("%d %s %f %f %s %d\n", t.TreasureID, t.Username, t.latitude, t.longitude, t.Cluetext, t.value);
 			}
-			Username[k] = '\0';
-			fread(&latitude, sizeof(float), 1, file);
-			fread(&longitude, sizeof(float), 1, file);
-			k = 0;
-			fread(&c, sizeof(char), 1, file);
-			while(c != ' ' && k < 255){
-				Cluetext[k++] = c;
-				fread(&c, sizeof(char), 1, file);
-			}
-			Cluetext[k] = '\0';
-			fread(&value, sizeof(int), 1, file);
-			printf("%d %s %f %f %s %d\n", TreasureID, Username, latitude, longitude, Cluetext, value);
-			
+			printf("Last time updated: %s", asctime(localtime(&t.rawtime)));
+			printf("Size of file: %d\n", size);
 		}
 		else{	
 			printf("Couldn't open file");
