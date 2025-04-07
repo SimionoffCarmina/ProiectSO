@@ -33,15 +33,14 @@ void add(char h[]){
 		char filename[255] = "";
 		strcat(filename, h);
 		strcat(filename, ".b");
-		FILE *file = fopen(filename, "a");
+		int file = open(filename, O_CREAT | O_APPEND);
 		if(file){
-			fwrite(&t, sizeof(Treasure), 1, file);
+			write(file, &t, sizeof(Treasure));
 		}
 		else{
 			printf("Couldn't open file");
 			exit(-1);
 		}
-		fclose(file);
 	}
 	else{
 		printf("Couldn't change directory");
@@ -57,16 +56,44 @@ void list(char h[]){
 		char filename[255] = "";
 		strcat(filename, h);
 		strcat(filename, ".b");
-		FILE *file = fopen(filename, "rb");
+		int file = open(filename, O_RDONLY);
 		if(file){
 			Treasure t;
 			int size = 0;
-			while(fread(&t, sizeof(Treasure), 1, file) == 1){
+			while(read(file, &t, sizeof(Treasure)) == sizeof(Treasure)){
 				size += sizeof(Treasure);
 				printf("%d %s %f %f %s %d\n", t.TreasureID, t.Username, t.latitude, t.longitude, t.Cluetext, t.value);
 			}
 			printf("Last time updated: %s", asctime(localtime(&t.rawtime)));
 			printf("Size of file: %d\n", size);
+		}
+		else{	
+			printf("Couldn't open file");
+			exit(-1);
+		}
+	}
+	else{
+		printf("Couldn't open directory");
+		exit(-1);
+	}
+}
+
+void view(char h[], int TreasureID){
+	char path[255] = "./";
+	strcat(path, h);
+	if(chdir(path) == 0){
+		char filename[255] = "";
+		strcat(filename, h);
+		strcat(filename, ".b");
+		int file = open(filename, O_RDONLY);
+		if(file){
+			Treasure t;
+			int size = 0;
+			while(read(file, &t, sizeof(Treasure)) == sizeof(Treasure)){
+				size += sizeof(Treasure);
+				if(t.TreasureID == TreasureID)
+					printf("%d %s %f %f %s %d\n", t.TreasureID, t.Username, t.latitude, t.longitude, t.Cluetext, t.value);
+			}
 		}
 		else{	
 			printf("Couldn't open file");
@@ -90,6 +117,17 @@ int main(int argc, char *argv[]){
 	else{
 		if(strcmp("--list", argv[1]) == 0){
 			list(argv[2]);
+		}
+		else{
+			if(strcmp("--view", argv[1]) == 0){
+				if(argc < 4){
+					printf("Numar gresit de argumente");
+					exit(-1);
+				}
+				else{
+					view(argv[2], atoi(argv[3]));
+				}
+			}
 		}
 	}
 	return 0;

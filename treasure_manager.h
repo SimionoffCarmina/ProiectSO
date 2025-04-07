@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
+#include <fcntl.h>
 
 typedef struct Treasure{
 	int TreasureID;
@@ -19,3 +20,4 @@ typedef struct Treasure{
 void add(char h[]);
 void list(char h[]);
 void view(char h[], int TreasureID);
+void remove_treasure(char h[], int TreasureID);
