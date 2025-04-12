@@ -121,6 +121,45 @@ void view(char h[], int TreasureID){
 	}
 }
 
+void search(char *filename, int TreasureID){
+	int file = open(filename, O_RDONLY);
+	int temp = open("temp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if(file){
+		Treasure t;
+		while(read(file, &t, sizeof(Treasure)) == sizeof(Treasure)){
+			if(t.TreasureID != TreasureID)
+				write(temp, &t, sizeof(Treasure));
+		}
+	}
+	else{	
+		printf("Couldn't open file");
+		exit(-1);
+	}
+	if (rename("temp", filename) != 0) {
+      		printf("Couldn't replace file");
+        	exit(-1);
+    	} 
+}
+
+void remove_treasure(char h[], int TreasureID){
+	char path[255] = "./";
+	strcat(path, h);
+	DIR *dir = opendir(path);
+	if(dir == NULL){
+		printf("Couldn't open directory");
+		exit(-1);
+	}
+	else{
+		chdir(path);
+		struct dirent *entry;
+		while ((entry = readdir(dir)) != NULL){
+			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+		    		continue;
+		    	search(entry->d_name, TreasureID);
+		}
+	}
+}
+
 void rem(char h[]){
 	char path[255] = "rm -rf ";
 	strcat(path, h);
@@ -150,8 +189,19 @@ int main(int argc, char *argv[]){
 				}
 			}
 			else{
-				if(strcmp("--remove", argv[1]) == 0){
+				if(strcmp("--remove_hunt", argv[1]) == 0){
 					rem(argv[2]);
+				}
+				else{
+					if(strcmp("--remove_treasure", argv[1]) == 0){
+						if(argc < 4){
+							printf("Nr gresit de argumente");
+							exit(-1);
+						}
+						else{
+							remove_treasure(argv[2], atoi(argv[3]));
+						}
+					}
 				}
 			}
 		}

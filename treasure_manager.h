@@ -23,4 +23,6 @@ void listFile(char *fileName);
 void list(char h[]);
 void enterFile(char *fileName, int TreasureID);
 void view(char h[], int TreasureID);
-void remove_treasure(char h[], int TreasureID);
+void search(char *filename, int TreasureID);
+void remove_treasure(char h[], int TreasuerID);
+void rem(char h[]);
