@@ -166,6 +166,21 @@ void rem(char h[]){
 	system(path);
 }
 
+void add_log(char h[], char *log){
+	char path[255] = "./";
+	strcat(path, h);
+	chdir(path);
+	strcat(log, "\n");
+	int nr = open("logged_file", O_WRONLY | O_CREAT | O_APPEND, 0644);
+	if(nr){
+		write(nr, log, sizeof(log));
+	}
+	else{	
+		printf("Couldn't open file");
+		exit(-1);
+	}
+}
+
 int main(int argc, char *argv[]){
 	if(argc < 3){
 		printf("Usage ./p --option <requirements>\n");
@@ -206,5 +221,6 @@ int main(int argc, char *argv[]){
 			}
 		}
 	}
+	add_log(argv[2], argv[1]);
 	return 0;
 }

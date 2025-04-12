@@ -26,3 +26,4 @@ void view(char h[], int TreasureID);
 void search(char *filename, int TreasureID);
 void remove_treasure(char h[], int TreasuerID);
 void rem(char h[]);
+void add_log(char h[], char *log);
