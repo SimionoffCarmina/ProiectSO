@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <fcntl.h>
+#include <dirent.h>
 
 typedef struct Treasure{
 	int TreasureID;

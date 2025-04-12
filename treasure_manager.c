@@ -32,8 +32,9 @@ void add(char h[]){
 	if(chdir(path) == 0){
 		char filename[255] = "";
 		strcat(filename, h);
+		strcat(filename, t.Username);
 		strcat(filename, ".b");
-		int file = open(filename, O_CREAT | O_APPEND);
+		int file = open(filename, O_CREAT | O_APPEND | O_WRONLY, 0644);
 		if(file){
 			write(file, &t, sizeof(Treasure));
 		}
@@ -49,32 +50,41 @@ void add(char h[]){
 	closedir(dir);
 }
 
+void listFile(char *filename){
+	int file = open(filename, O_RDONLY);
+	if(file){
+		Treasure t;
+		int size = 0;
+		while(read(file, &t, sizeof(Treasure)) == sizeof(Treasure)){
+			printf("aaa");
+			size += sizeof(Treasure);
+			printf("%d %s %f %f %s %d\n", t.TreasureID, t.Username, t.latitude, t.longitude, t.Cluetext, t.value);
+		}
+		printf("Last time updated: %s", asctime(localtime(&t.rawtime)));
+		printf("Size of file: %d\n", size);
+	}
+	else{	
+		printf("Couldn't open file");
+		exit(-1);
+	}
+}
+
 void list(char h[]){
 	char path[255] = "./";
 	strcat(path, h);
-	if(chdir(path) == 0){
-		char filename[255] = "";
-		strcat(filename, h);
-		strcat(filename, ".b");
-		int file = open(filename, O_RDONLY);
-		if(file){
-			Treasure t;
-			int size = 0;
-			while(read(file, &t, sizeof(Treasure)) == sizeof(Treasure)){
-				size += sizeof(Treasure);
-				printf("%d %s %f %f %s %d\n", t.TreasureID, t.Username, t.latitude, t.longitude, t.Cluetext, t.value);
-			}
-			printf("Last time updated: %s", asctime(localtime(&t.rawtime)));
-			printf("Size of file: %d\n", size);
-		}
-		else{	
-			printf("Couldn't open file");
-			exit(-1);
-		}
-	}
-	else{
+	DIR *dir = opendir(path);
+	if(dir == NULL){
 		printf("Couldn't open directory");
 		exit(-1);
+	}
+	else{
+		chdir(path);
+		struct dirent *entry;
+		while ((entry = readdir(dir)) != NULL){
+			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+		    		continue;
+		    	listFile(entry->d_name);
+		}
 	}
 }
 
