@@ -121,6 +121,12 @@ void view(char h[], int TreasureID){
 	}
 }
 
+void rem(char h[]){
+	char path[255] = "rm -rf ";
+	strcat(path, h);
+	system(path);
+}
+
 int main(int argc, char *argv[]){
 	if(argc < 3){
 		printf("Usage ./p --option <requirements>\n");
@@ -141,6 +147,11 @@ int main(int argc, char *argv[]){
 				}
 				else{
 					view(argv[2], atoi(argv[3]));
+				}
+			}
+			else{
+				if(strcmp("--remove", argv[1]) == 0){
+					rem(argv[2]);
 				}
 			}
 		}
