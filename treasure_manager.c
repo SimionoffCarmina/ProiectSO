@@ -166,17 +166,34 @@ void rem(char h[]){
 	system(path);
 }
 
-void add_log(char h[], char *log){
+void add_log(char h[], char log[]){
 	char path[255] = "./";
 	strcat(path, h);
 	chdir(path);
-	strcat(log, "\n");
-	int nr = open("logged_file", O_WRONLY | O_CREAT | O_APPEND, 0644);
-	if(nr){
-		write(nr, log, sizeof(log));
+	char name[255] = "logged_file";
+	strcat(name, h);
+	int nr = open(name, O_WRONLY | O_CREAT | O_APPEND, 0644);
+	char buf[300];
+	strcpy(buf, log);
+	strcat(buf, "\n");
+	if(nr != -1){
+		write(nr, buf, strlen(buf));
 	}
 	else{	
 		printf("Couldn't open file");
+		exit(-1);
+	}
+	char sym[600] = "";
+	//system("chdir ..");
+	snprintf(sym, sizeof(sym), "%s/%s", path, name);
+	char link[255] = "logged_link";
+	strcat(link, h);
+	printf("%s\n", sym);
+	printf("%s\n", h);
+	chdir("..");
+	int result = symlink(sym, link);
+	if(result != 0){
+		printf("err");
 		exit(-1);
 	}
 }
