@@ -35,15 +35,18 @@ void add(char h[]){
 		strcat(filename, t.Username);
 		strcat(filename, ".b");
 		int file = open(filename, O_CREAT | O_APPEND | O_WRONLY, 0644);
-		if(file){
+		if(file != 1){
 			write(file, &t, sizeof(Treasure));
 		}
 		else{
+			close(file);
 			printf("Couldn't open file");
 			exit(-1);
 		}
+		close(file);
 	}
-	else{
+	else{	
+		closedir(dir);
 		printf("Couldn't change directory");
 		exit(-1);
 	}
@@ -63,9 +66,11 @@ void listFile(char *filename){
 		printf("Size of file: %d\n", size);
 	}
 	else{	
+		close(file);
 		printf("Couldn't open file");
 		exit(-1);
 	}
+	close(file);
 }
 
 void list(char h[]){
@@ -73,6 +78,7 @@ void list(char h[]){
 	strcat(path, h);
 	DIR *dir = opendir(path);
 	if(dir == NULL){
+		closedir(dir);
 		printf("Couldn't open directory");
 		exit(-1);
 	}
@@ -85,11 +91,12 @@ void list(char h[]){
 		    	listFile(entry->d_name);
 		}
 	}
+	closedir(dir);
 }
 
 void enterFile(char *filename, int TreasureID){
 	int file = open(filename, O_RDONLY);
-	if(file){
+	if(file != -1){
 		Treasure t;
 		while(read(file, &t, sizeof(Treasure)) == sizeof(Treasure)){
 			if(t.TreasureID == TreasureID)
@@ -97,9 +104,11 @@ void enterFile(char *filename, int TreasureID){
 		}
 	}
 	else{	
+		close(file);
 		printf("Couldn't open file");
 		exit(-1);
 	}
+	close(file);
 }
 
 void view(char h[], int TreasureID){
@@ -107,6 +116,7 @@ void view(char h[], int TreasureID){
 	strcat(path, h);
 	DIR *dir = opendir(path);
 	if(dir == NULL){
+		closedir(dir);
 		printf("Couldn't open directory");
 		exit(-1);
 	}
@@ -119,12 +129,13 @@ void view(char h[], int TreasureID){
 		    	enterFile(entry->d_name, TreasureID);
 		}
 	}
+	closedir(dir);
 }
 
 void search(char *filename, int TreasureID){
 	int file = open(filename, O_RDONLY);
 	int temp = open("temp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if(file){
+	if(file != -1){
 		Treasure t;
 		while(read(file, &t, sizeof(Treasure)) == sizeof(Treasure)){
 			if(t.TreasureID != TreasureID)
@@ -132,6 +143,7 @@ void search(char *filename, int TreasureID){
 		}
 	}
 	else{	
+		close(file);
 		printf("Couldn't open file");
 		exit(-1);
 	}
@@ -139,6 +151,8 @@ void search(char *filename, int TreasureID){
       		printf("Couldn't replace file");
         	exit(-1);
     	} 
+    	close(file);
+    	close(temp);
 }
 
 void remove_treasure(char h[], int TreasureID){
@@ -146,6 +160,7 @@ void remove_treasure(char h[], int TreasureID){
 	strcat(path, h);
 	DIR *dir = opendir(path);
 	if(dir == NULL){
+		closedir(dir);
 		printf("Couldn't open directory");
 		exit(-1);
 	}
@@ -158,6 +173,7 @@ void remove_treasure(char h[], int TreasureID){
 		    	search(entry->d_name, TreasureID);
 		}
 	}
+	closedir(dir);
 }
 
 void rem(char h[]){
@@ -167,15 +183,17 @@ void rem(char h[]){
 }
 
 void add_log(char h[], char log[]){
-	char path[255] = "./";
+	char path[255] = "/";
 	strcat(path, h);
 	chdir(path);
+	
 	char name[255] = "logged_file";
 	strcat(name, h);
 	int nr = open(name, O_WRONLY | O_CREAT | O_APPEND, 0644);
 	char buf[300];
 	strcpy(buf, log);
 	strcat(buf, "\n");
+	
 	if(nr != -1){
 		write(nr, buf, strlen(buf));
 	}
@@ -184,18 +202,17 @@ void add_log(char h[], char log[]){
 		exit(-1);
 	}
 	char sym[600] = "";
-	//system("chdir ..");
 	snprintf(sym, sizeof(sym), "%s/%s", path, name);
 	char link[255] = "logged_link";
 	strcat(link, h);
-	printf("%s\n", sym);
-	printf("%s\n", h);
-	chdir("..");
+	printf("%s %s\n", sym, link);
+	unlink(link);
 	int result = symlink(sym, link);
 	if(result != 0){
-		printf("err");
+		printf("Aici e eroarea");
 		exit(-1);
 	}
+	close(nr);
 }
 
 int main(int argc, char *argv[]){
