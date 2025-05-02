@@ -20,7 +20,11 @@ void add(char h[]){
 	
 	Treasure t;
 	
-	printf("Enter TreasureID: "); scanf("%d", &t.TreasureID);
+	printf("Enter TreasureID: "); 
+	if((scanf("%d", &t.TreasureID)) != 1){
+		printf("Nu s-a citit bine");
+		exit(-1);
+	}
 	printf("Enter Username: "); scanf("%s", t.Username);
 	printf("Enter latitude: "); scanf("%f", &t.latitude);
 	printf("Enter longitude: "); scanf("%f", &t.longitude);
