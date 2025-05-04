@@ -57,6 +57,79 @@ void add(char h[]){
 	closedir(dir);
 }
 
+int countTreasures(char *filename){
+	int nr1 = 0;
+	int file = open(filename, O_RDONLY);
+	if(file){
+		Treasure t;
+		int size = 0;
+		while(read(file, &t, sizeof(Treasure)) == sizeof(Treasure)){
+			size += sizeof(Treasure);
+			nr1++;
+		}
+	}
+	else{	
+		close(file);
+		printf("Couldn't open file");
+		exit(-1);
+	}
+	close(file);
+	return nr1;
+}
+
+int countHunt(char h[]){
+	int nr = 0;
+	char path[255] = "./";
+	strcat(path, h);
+	DIR *dir = opendir(path);
+	if(dir == NULL){
+		closedir(dir);
+		printf("Couldn't open directory");
+		exit(-1);
+	}
+	else{
+		chdir(path);
+		struct dirent *entry;
+		while ((entry = readdir(dir)) != NULL){
+			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+		    		continue;
+		    	if(strncmp(entry->d_name, "Hunt", 4) == 0) 
+		    		nr += countTreasures(entry->d_name);
+		}
+	}
+	closedir(dir);
+	return nr;
+}
+
+int is_hunt_directory(char *name){
+	struct stat st;
+	if(stat(name, &st) == 0 && S_ISDIR(st.st_mode)){
+        	return strncmp(name, "Hunt", 4) == 0;
+    	}
+    	return -2;
+}
+
+void listHunts(){
+    	DIR *dir;
+    	struct dirent *directory;
+    
+    	dir = opendir(".");
+    
+    	if(dir == NULL){
+        	printf("err opening directory");
+        	exit(-1);
+    	}
+    
+    	printf("Hunts: ");
+    	while((directory = readdir(dir)) != NULL){
+        	if(is_hunt_directory(directory->d_name) == 1) {
+        		printf("%s %d\n", directory->d_name, countHunt(directory->d_name));
+        	}
+    	}
+    	printf("\n");
+    	closedir(dir);
+}
+
 void listFile(char *filename){
 	int file = open(filename, O_RDONLY);
 	if(file){
@@ -92,7 +165,8 @@ void list(char h[]){
 		while ((entry = readdir(dir)) != NULL){
 			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 		    		continue;
-		    	listFile(entry->d_name);
+		    	if(strncmp(entry->d_name, "Hunt", 4) == 0) 
+		    		listFile(entry->d_name);
 		}
 	}
 	closedir(dir);
@@ -220,7 +294,7 @@ void add_log(char h[], char log[]){
 }
 
 int main(int argc, char *argv[]){
-	if(argc < 3){
+	/*if(argc < 3){
 		printf("Usage ./p --option <requirements>\n");
 		exit(-1);
 	}
@@ -258,7 +332,8 @@ int main(int argc, char *argv[]){
 				}
 			}
 		}
-	}
+	}*/
+	listHunts();
 	add_log(argv[2], argv[1]);
 	return 0;
 }

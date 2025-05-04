@@ -1,33 +1,80 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
+#include "treasure_hub.h"
 
-void start_monitor(){
+pid_t start_monitor(){
 	pid_t pid = fork();
-	
 	if(pid < 0){
-		printf("Couldnt fork");
+		printf("Error starting monitor");
 		exit(-1);
 	}
+	if(pid == 0){
+		exit(-1);
+	}
+	return pid;
+}
+
+void stop_monitor(){
+	FILE *f = fopen("commands.txt", "r");
+	if(f == NULL){
+		printf("Error opening file");
+		exit(-1);
+	}
+	pid_t pid;
+	if(fscanf(f, "%d", &pid) != 1){
+		printf("error reading from file");
+		fclose(f);
+		exit(-1);
+	}
+	fclose(f);
+	if(kill(pid, SIGTERM) == 0){
+		printf("Stopped monitor\n");
+	}
 	else{
-		if(pid == 0){
-			printf("Monitor started %d\n", getpid());
-		}
-		else{
-			printf("Background program, pid: %d\n", pid);
-		}
+		printf("error stopping monitor");
+		exit(-1);
 	}
 }
 
 int main(int argc, char *argv[]){
-	if(argc < 2){
-		printf("Usage ./p <command>\n"); 
-		exit(-1);
-	}
-	if(strcmp("start_monitor", argv[1]) == 0){
-		start_monitor();
+	int is_active = 0;
+	char option[255];
+	while(1){
+		printf("Please choose an operation:\n1)start_monitor\n2)list_hunts\n3)list_treasures\n4)view_treasure\n5)stop_monitor\n6)exit\n");
+		fgets(option, sizeof(option), stdin);
+		option[strcspn(option, "\n")] = 0;
+		if(strcmp(option, "start_monitor") == 0){
+			if(is_active == 1){
+				printf("Monitor already started\n");
+			}
+			else{
+				pid_t pid = start_monitor();
+				printf("Monitor started with pid: %d\n", pid);
+				FILE *fin = fopen("commands.txt", "w");
+				if(fin == NULL){
+					printf("error opening file");
+					exit(-1);
+				}
+				fprintf(fin, "%d", pid);
+				fclose(fin);
+				is_active = 1;
+			}
+		}
+		if(strcmp(option, "stop_monitor") == 0){
+			if(is_active == 0){
+				printf("Monitor is not active\n");
+			}
+			else{
+				is_active = 0;
+				stop_monitor();
+			}
+		}
+		if(strcmp(option, "exit") == 0){
+			if(is_active == 1){
+				printf("Monitor still active, stop it first\n");
+			}
+			else{
+				break;
+			}
+		}
 	}
 	return 0;
 }
