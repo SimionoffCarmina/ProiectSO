@@ -34,6 +34,19 @@ void stop_monitor(){
 	}
 }
 
+void handle_sigusr(int sig){
+	if(sig == SIGUSR1){
+		FILE *option = fopen("options.txt", "r");
+		char op[30];
+		fscanf(option, "%s", op);
+		printf("aaa");
+	}
+}
+
+void list_hunts(){
+	
+}
+
 int main(int argc, char *argv[]){
 	int is_active = 0;
 	char option[255];
@@ -65,6 +78,38 @@ int main(int argc, char *argv[]){
 			else{
 				is_active = 0;
 				stop_monitor();
+			}
+		}
+		if(strcmp(option, "list_hunts") == 0){
+			if(is_active == 0){
+				printf("Monitor is not active");
+			}
+			else{
+				FILE *fin = fopen("commands.txt", "r");
+				FILE *fout = fopen("option.txt", "w");
+				pid_t pid;
+				if(fin == NULL){
+					printf("Couldnt open file\n");
+					exit(-1);
+				}
+				else{
+					fscanf(fin, "%d", &pid);
+				}
+				fclose(fin);
+				if(fout == NULL){
+					printf("Couldnt open file\n");
+					exit(-1);
+				}
+				else{
+					fprintf(fout, "%s", "list_hunts");
+					if(kill(pid, SIGUSR1) == 0){
+						printf("Listing hunts\n");
+					}
+					else{
+						printf("Error sending signal");
+						exit(-1);
+					}
+				}
 			}
 		}
 		if(strcmp(option, "exit") == 0){
