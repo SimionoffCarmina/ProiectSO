@@ -93,13 +93,13 @@ int main(int argc, char *argv[]){
 						else{
 							fscanf(fin, "%d", &pid);
 						}
-						fclose(fin);
 						if(fout == NULL){
 							printf("Couldnt open file\n");
 							exit(-1);
 						}
 						else{
 							fprintf(fout, "%d", 1);
+							fclose(fout);
 							if(kill(pid, SIGUSR1) == 0){
 								printf("Listing hunts\n");
 							}
@@ -108,6 +108,7 @@ int main(int argc, char *argv[]){
 								exit(-1);
 							}
 						}
+						fclose(fin);
 					}
 				}
 				if(strcmp(option, "exit") == 0){

@@ -126,7 +126,6 @@ void listHunts(){
         		printf("%s %d\n", directory->d_name, countHunt(directory->d_name));
         	}
     	}
-    	printf("\n");
     	closedir(dir);
 }
 

@@ -4,11 +4,12 @@
 void handle_sigusr(int sig){
 	if(sig == SIGUSR1){
 		FILE *f = fopen("options.txt", "r");
-		int op;
-		fscanf(f, "%d", &op);
-		printf("%dAAAAA", op);
-		fflush(stdout);
-		if(op == 1){
+		if(f == NULL){
+			printf("EROARE");
+		}
+		int c;
+		fscanf(f, "%d", &c);
+		if(c == 1){
 			listHunts();
 		}
 	}
