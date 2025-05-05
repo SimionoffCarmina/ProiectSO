@@ -111,6 +111,41 @@ int main(int argc, char *argv[]){
 						fclose(fin);
 					}
 				}
+				if(strcmp(option, "list_treasures") == 0){
+					if(is_active == 0){
+						printf("Monitor is not active");
+					}
+					else{
+						FILE *fin = fopen("commands.txt", "r");
+						FILE *fout = fopen("options.txt", "w");
+						pid_t pid;
+						if(fin == NULL){
+							printf("Couldnt open file\n");
+							exit(-1);
+						}
+						else{
+							fscanf(fin, "%d", &pid);
+						}
+						if(fout == NULL){
+							printf("Couldnt open file\n");
+							exit(-1);
+						}
+						else{
+							fprintf(fout, "%d", 2); 
+							fclose(fout);
+							if(kill(pid, SIGUSR1) == 0){
+								printf("Viewing treasures \n");
+							}
+							else{
+								printf("Error sending signal");
+								exit(-1);
+							}
+							sleep(1);
+						}
+						fclose(fin);
+					}
+				}
+				
 				if(strcmp(option, "exit") == 0){
 					if(is_active == 1){
 						printf("Monitor still active, stop it first\n");

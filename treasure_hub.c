@@ -8,9 +8,16 @@ void handle_sigusr(int sig){
 			printf("EROARE");
 		}
 		int c;
-		fscanf(f, "%d", &c);
+		char hunt[255];
+		fscanf(f, "%d %s", &c, hunt);
 		if(c == 1){
 			listHunts();
+		}
+		if(c == 2){
+			printf("Enter hunt:");
+			char h[255];
+			scanf("%s", h);
+			list(h);
 		}
 	}
 }
