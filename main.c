@@ -98,7 +98,9 @@ int main(int argc, char *argv[]){
 							exit(-1);
 						}
 						else{
-							fprintf(fout, "%d", 1);
+							fprintf(fout, "%d", 3);
+							fflush(fout);         
+							fsync(fileno(fout));  
 							fclose(fout);
 							if(kill(pid, SIGUSR1) == 0){
 								printf("Listing hunts\n");
@@ -139,15 +141,15 @@ int main(int argc, char *argv[]){
 							fflush(fout);         
 							fsync(fileno(fout));  
 							fclose(fout);	
-							if(kill(pid, SIGUSR2) == 0){
+							if(kill(pid, SIGUSR1) == 0){
 								printf("Listing treasures \n");
 							}
 							else{
 								printf("Error sending signal");
 								exit(-1);
 							}
-							sleep(2);
 						}
+						sleep(1);
 						fclose(fin);
 					}
 				}
@@ -176,15 +178,18 @@ int main(int argc, char *argv[]){
 							int id;
 							scanf("%s %d", h, &id);
 							fprintf(fout, "%d %s %d",2,  h, id);
-							if(kill(pid, SIGUSR2) == 0){
+							fflush(fout);                
+							fsync(fileno(fout));         
+							fclose(fout);
+							if(kill(pid, SIGUSR1) == 0){
 								printf("Viewing treasure \n");
 							}
 							else{
 								printf("Error sending signal");
 								exit(-1);
 							}
-							sleep(1);
 						}
+						sleep(1);
 						fclose(fin);
 					}
 				}

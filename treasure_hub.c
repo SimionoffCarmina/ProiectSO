@@ -8,23 +8,26 @@ void handle_sigusr(int sig){
 		chdir("..");
 	}
 	if(sig == SIGUSR1){
-		listHunts();
-	}
-	else{
-		if(sig == SIGUSR2){
-			FILE *fin = fopen("options.txt", "r");
-			int op;
-			char h[255];
-			int id;
-			if(fin == NULL){
-				printf("err");
-				exit(-1);
-			}
-			fscanf(fin, "%d %s %d", &op, h, &id);
-			if(op == 1)
-				list(h);
-			if(op == 2)
-				view(h, id);
+		FILE *fin = fopen("options.txt", "r");
+		int op;
+		char h[255];
+		int id;
+		if(fin == NULL){
+			printf("err");
+			exit(-1);
+		}
+		rewind(fin);
+		fscanf(fin, "%d %s %d", &op, h, &id);
+		if(op == 1){
+			list(h);
+		}
+		if(op == 2){
+			fflush(stdout);
+			view(h, id);
+		
+		}
+		if(op == 3){
+			listHunts();
 		}
 	}
 }
@@ -42,15 +45,6 @@ pid_t start_monitor(){
 		
 		if(sigaction(SIGUSR1, &sig1, NULL) == -1){
 			printf("error sigaction");
-			exit(-1);
-		}
-		
-		struct sigaction sig2;
-		sig2.sa_handler = handle_sigusr;
-		sig2.sa_flags = 0;
-		
-		if(sigaction(SIGUSR2, &sig2, NULL) == -1){
-			printf("err");
 			exit(-1);
 		}
 		while(1){
