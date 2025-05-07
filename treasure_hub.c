@@ -2,21 +2,23 @@
 #include "treasure_manager.h"
 
 void handle_sigusr(int sig){
+	char cwd[256];
+	getcwd(cwd, sizeof(cwd));
+	if(strcmp(cwd, "/home/debian/ProiectSO") != 0){
+		chdir("..");
+	}
 	if(sig == SIGUSR1){
-		FILE *f = fopen("options.txt", "r");
-		if(f == NULL){
-			printf("EROARE");
-		}
-		int c;
-		char hunt[255];
-		fscanf(f, "%d %s", &c, hunt);
-		if(c == 1){
-			listHunts();
-		}
-		if(c == 2){
-			printf("Enter hunt:");
+		listHunts();
+	}
+	else{
+		if(sig == SIGUSR2){
+			FILE *fin = fopen("options.txt", "r");
 			char h[255];
-			scanf("%s", h);
+			if(fin == NULL){
+				printf("err");
+				exit(-1);
+			}
+			fscanf(fin, "%s", h);
 			list(h);
 		}
 	}
@@ -35,6 +37,15 @@ pid_t start_monitor(){
 		
 		if(sigaction(SIGUSR1, &sig1, NULL) == -1){
 			printf("error sigaction");
+			exit(-1);
+		}
+		
+		struct sigaction sig2;
+		sig2.sa_handler = handle_sigusr;
+		sig2.sa_flags = 0;
+		
+		if(sigaction(SIGUSR2, &sig2, NULL) == -1){
+			printf("err");
 			exit(-1);
 		}
 		while(1){

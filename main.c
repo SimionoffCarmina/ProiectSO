@@ -108,10 +108,49 @@ int main(int argc, char *argv[]){
 								exit(-1);
 							}
 						}
+						sleep(1);
 						fclose(fin);
 					}
 				}
 				if(strcmp(option, "list_treasures") == 0){
+					if(is_active == 0){
+						printf("Monitor is not active");
+					}
+					else{
+						FILE *fout = fopen("options.txt", "w");
+						pid_t pid;
+						if(fin == NULL){
+							printf("Couldnt open file\n");
+							exit(-1);
+						}
+						else{
+							fscanf(fin, "%d", &pid);
+						}
+						if(fout == NULL){
+							printf("Couldnt open file\n");
+							exit(-1);
+						}
+						else{
+							printf("Please enter hunt:\n");
+							char hunt[255];
+							scanf("%s", hunt);
+							fprintf(fout, "%s", hunt); 
+							fflush(fout);         
+							fsync(fileno(fout));  
+							fclose(fout);	
+							if(kill(pid, SIGUSR2) == 0){
+								printf("Listing treasures \n");
+							}
+							else{
+								printf("Error sending signal");
+								exit(-1);
+							}
+							sleep(2);
+						}
+						fclose(fin);
+					}
+				}
+				if(strcmp(option, "view_treasure") == 0){
 					if(is_active == 0){
 						printf("Monitor is not active");
 					}
@@ -131,10 +170,10 @@ int main(int argc, char *argv[]){
 							exit(-1);
 						}
 						else{
-							fprintf(fout, "%d", 2); 
+							fprintf(fout, "%d", 3); 
 							fclose(fout);
-							if(kill(pid, SIGUSR1) == 0){
-								printf("Viewing treasures \n");
+							if(kill(pid, SIGUSR3) == 0){
+								printf("Viewing treasure \n");
 							}
 							else{
 								printf("Error sending signal");
