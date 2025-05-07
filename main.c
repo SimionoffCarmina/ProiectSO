@@ -117,6 +117,7 @@ int main(int argc, char *argv[]){
 						printf("Monitor is not active");
 					}
 					else{
+						FILE *fin = fopen("commands.txt", "r");
 						FILE *fout = fopen("options.txt", "w");
 						pid_t pid;
 						if(fin == NULL){
@@ -134,7 +135,7 @@ int main(int argc, char *argv[]){
 							printf("Please enter hunt:\n");
 							char hunt[255];
 							scanf("%s", hunt);
-							fprintf(fout, "%s", hunt); 
+							fprintf(fout, "%d %s",1,  hunt); 
 							fflush(fout);         
 							fsync(fileno(fout));  
 							fclose(fout);	
@@ -170,9 +171,12 @@ int main(int argc, char *argv[]){
 							exit(-1);
 						}
 						else{
-							fprintf(fout, "%d", 3); 
-							fclose(fout);
-							if(kill(pid, SIGUSR3) == 0){
+							printf("Enter hunt and treasure id\n");
+							char h[255];
+							int id;
+							scanf("%s %d", h, &id);
+							fprintf(fout, "%d %s %d",2,  h, id);
+							if(kill(pid, SIGUSR2) == 0){
 								printf("Viewing treasure \n");
 							}
 							else{

@@ -13,13 +13,18 @@ void handle_sigusr(int sig){
 	else{
 		if(sig == SIGUSR2){
 			FILE *fin = fopen("options.txt", "r");
+			int op;
 			char h[255];
+			int id;
 			if(fin == NULL){
 				printf("err");
 				exit(-1);
 			}
-			fscanf(fin, "%s", h);
-			list(h);
+			fscanf(fin, "%d %s %d", &op, h, &id);
+			if(op == 1)
+				list(h);
+			if(op == 2)
+				view(h, id);
 		}
 	}
 }
