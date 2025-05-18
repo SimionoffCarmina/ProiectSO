@@ -109,10 +109,14 @@ int is_hunt_directory(char *name){
     	return -2;
 }
 
-void listHunts(){
+char *listHunts(){
     	DIR *dir;
     	struct dirent *directory;
-    
+    	char *aux = (char*)malloc(255 * sizeof(char));
+    	if(aux == NULL){
+    		printf("Memory error");
+    		exit(-1);
+    	}
     	dir = opendir(".");
     
     	if(dir == NULL){
@@ -121,12 +125,18 @@ void listHunts(){
     	}
     
     	printf("Hunts: ");
+    	char numString[20];
     	while((directory = readdir(dir)) != NULL){
         	if(is_hunt_directory(directory->d_name) == 1) {
-        		printf("%s %d\n", directory->d_name, countHunt(directory->d_name));
+        		strcat(aux, directory->d_name);
+        		strcat(aux, " ");
+        		sprintf(numString, "%d", countHunt(directory->d_name));
+			strcat(aux, numString);
+			strcat(aux, "\n");
         	}
     	}
     	closedir(dir);
+    	return aux;
 }
 
 void listFile(char *filename){

@@ -27,7 +27,9 @@ void handle_sigusr(int sig){
 		
 		}
 		if(op == 3){
-			listHunts();
+			char *c = listHunts();
+			printf("%s\n", c);
+			fflush(stdout);
 		}
 	}
 }

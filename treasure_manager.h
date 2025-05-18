@@ -19,7 +19,7 @@ typedef struct Treasure{
 }Treasure;
 
 void add(char h[]);
-void listHunts();
+char *listHunts();
 void listFile(char *fileName);
 void list(char h[]);
 void enterFile(char *fileName, int TreasureID);
