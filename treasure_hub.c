@@ -21,18 +21,19 @@ void handle_sigusr(int sig){
 		fclose(fin);
 		if(op == 1){
 			list(h);
-			fflush(stdout);
 		}
 		if(op == 2){
-			fflush(stdout);
 			view(h, id);
+			fflush(stdout);
 		
 		}
 		if(op == 3){
 			listHunts();
+			fflush(stdout);
 		}
+		printf("<<END>>\n");
+		fflush(stdout);
 	}
-	fflush(stdout);
 }
 
 pid_t start_monitor(int *out_pipe){

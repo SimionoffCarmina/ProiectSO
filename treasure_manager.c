@@ -178,7 +178,7 @@ void enterFile(char *filename, int TreasureID){
 		Treasure t;
 		while(read(file, &t, sizeof(Treasure)) == sizeof(Treasure)){
 			if(t.TreasureID == TreasureID){
-				printf("%d %s %f %f %s %dAAA\n", t.TreasureID, t.Username, t.latitude, t.longitude, t.Cluetext, t.value);
+				printf("%d %s %f %f %s %d\n", t.TreasureID, t.Username, t.latitude, t.longitude, t.Cluetext, t.value);
 				fflush(stdout);
 			}
 		}

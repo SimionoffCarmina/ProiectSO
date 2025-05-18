@@ -106,12 +106,21 @@ int main(int argc, char *argv[]){
 							if(kill(pid, SIGUSR1) == 0){
 								printf("Listing hunts\n");
 								
+								sleep(1);
 								char buffer[256];
 								ssize_t bytes;
-								
+								int found_end = 0;
+
 								while((bytes = read(pipefd[0], buffer, sizeof(buffer) - 1)) > 0){
 									buffer[bytes] = '\0';
 									printf("%s", buffer);
+									if (strstr(buffer, "<<END>>") != NULL) {
+										found_end = 1;
+										break;
+									}
+								}
+								if (!found_end) {
+									printf("Warning: did not receive <<END>> marker\n");
 								}
 							}
 							else{
@@ -153,12 +162,21 @@ int main(int argc, char *argv[]){
 							if(kill(pid, SIGUSR1) == 0){
 								printf("Listing treasures \n");
 								
+								sleep(1);
 								char buffer[256];
 								ssize_t bytes;
-								
+								int found_end = 0;
+	
 								while ((bytes = read(pipefd[0], buffer, sizeof(buffer) - 1)) > 0) {
 									buffer[bytes] = '\0';
 									printf("%s", buffer);
+									if (strstr(buffer, "<<END>>") != NULL) {
+										found_end = 1;
+										break;
+									}
+								}
+								if (!found_end) {
+									printf("Warning: did not receive <<END>> marker\n");
 								}
 							}
 							else{
@@ -201,12 +219,22 @@ int main(int argc, char *argv[]){
 							if(kill(pid, SIGUSR1) == 0){
 								printf("Viewing treasure \n");
 								
+								sleep(1);
 								char buffer[256];
 								ssize_t bytes;
+								int found_end = 0;
+
 								
 								while ((bytes = read(pipefd[0], buffer, sizeof(buffer) - 1)) > 0) {
 									buffer[bytes] = '\0';
 									printf("%s", buffer);
+									if (strstr(buffer, "<<END>>") != NULL) {
+										found_end = 1;
+										break;
+									}
+								}
+								if (!found_end) {
+									printf("Warning: did not receive <<END>> marker\n");
 								}
 							}
 							else{
