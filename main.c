@@ -48,6 +48,7 @@ int main(int argc, char *argv[]){
 		if(strcmp("./hub", argv[0]) == 0){
 			int is_active = 0;
 			char option[255];
+			int pipefd[2];
 			while(1){
 				printf("Please choose an operation:\n1)start_monitor\n2)list_hunts\n3)list_treasures\n4)view_treasure\n5)stop_monitor\n6)exit\n");
 				fgets(option, sizeof(option), stdin);
@@ -57,7 +58,7 @@ int main(int argc, char *argv[]){
 						printf("Monitor already started\n");
 					}
 					else{
-						pid_t pid = start_monitor();
+						pid_t pid = start_monitor(pipefd);
 						printf("Monitor started with pid: %d\n", pid);
 						FILE *fin = fopen("commands.txt", "w");
 						if(fin == NULL){
@@ -104,6 +105,14 @@ int main(int argc, char *argv[]){
 							fclose(fout);
 							if(kill(pid, SIGUSR1) == 0){
 								printf("Listing hunts\n");
+								
+								char buffer[256];
+								ssize_t bytes;
+								
+								while((bytes = read(pipefd[0], buffer, sizeof(buffer) - 1)) > 0){
+									buffer[bytes] = '\0';
+									printf("%s", buffer);
+								}
 							}
 							else{
 								printf("Error sending signal");
@@ -143,6 +152,14 @@ int main(int argc, char *argv[]){
 							fclose(fout);	
 							if(kill(pid, SIGUSR1) == 0){
 								printf("Listing treasures \n");
+								
+								char buffer[256];
+								ssize_t bytes;
+								
+								while ((bytes = read(pipefd[0], buffer, sizeof(buffer) - 1)) > 0) {
+									buffer[bytes] = '\0';
+									printf("%s", buffer);
+								}
 							}
 							else{
 								printf("Error sending signal");
@@ -183,6 +200,14 @@ int main(int argc, char *argv[]){
 							fclose(fout);
 							if(kill(pid, SIGUSR1) == 0){
 								printf("Viewing treasure \n");
+								
+								char buffer[256];
+								ssize_t bytes;
+								
+								while ((bytes = read(pipefd[0], buffer, sizeof(buffer) - 1)) > 0) {
+									buffer[bytes] = '\0';
+									printf("%s", buffer);
+								}
 							}
 							else{
 								printf("Error sending signal");

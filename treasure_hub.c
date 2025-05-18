@@ -18,8 +18,10 @@ void handle_sigusr(int sig){
 		}
 		rewind(fin);
 		fscanf(fin, "%d %s %d", &op, h, &id);
+		fclose(fin);
 		if(op == 1){
 			list(h);
+			fflush(stdout);
 		}
 		if(op == 2){
 			fflush(stdout);
@@ -27,20 +29,32 @@ void handle_sigusr(int sig){
 		
 		}
 		if(op == 3){
-			char *c = listHunts();
-			printf("%s\n", c);
-			fflush(stdout);
+			listHunts();
 		}
 	}
+	fflush(stdout);
 }
 
-pid_t start_monitor(){
+pid_t start_monitor(int *out_pipe){
+	int pipefd[2];
+	if(pipe(pipefd) == -1){
+		printf("Pipe error");
+		exit(-1);
+	}
+	
 	pid_t pid = fork();
 	if(pid < 0){
 		printf("Error starting monitor");
 		exit(-1);
 	}
 	if(pid == 0){
+		close(pipefd[0]);
+		
+		dup2(pipefd[1], STDOUT_FILENO);
+		close(pipefd[1]);
+		
+		setvbuf(stdout, NULL, _IONBF, 0);
+		
 		struct sigaction sig1;
 		sig1.sa_handler = handle_sigusr;
 		sig1.sa_flags = 0;
@@ -53,6 +67,8 @@ pid_t start_monitor(){
 			pause();
 		}
 	}
+	close(pipefd[1]);
+	*out_pipe = pipefd[0];
 	return pid;
 }
 

@@ -109,14 +109,9 @@ int is_hunt_directory(char *name){
     	return -2;
 }
 
-char *listHunts(){
+void listHunts(){
     	DIR *dir;
     	struct dirent *directory;
-    	char *aux = (char*)malloc(255 * sizeof(char));
-    	if(aux == NULL){
-    		printf("Memory error");
-    		exit(-1);
-    	}
     	dir = opendir(".");
     
     	if(dir == NULL){
@@ -125,18 +120,13 @@ char *listHunts(){
     	}
     
     	printf("Hunts: ");
-    	char numString[20];
     	while((directory = readdir(dir)) != NULL){
         	if(is_hunt_directory(directory->d_name) == 1) {
-        		strcat(aux, directory->d_name);
-        		strcat(aux, " ");
-        		sprintf(numString, "%d", countHunt(directory->d_name));
-			strcat(aux, numString);
-			strcat(aux, "\n");
+        		printf("%s %d\n", directory->d_name, countHunt(directory->d_name));
+        		fflush(stdout);
         	}
     	}
     	closedir(dir);
-    	return aux;
 }
 
 void listFile(char *filename){
@@ -150,6 +140,7 @@ void listFile(char *filename){
 		}
 		printf("Last time updated: %s", asctime(localtime(&t.rawtime)));
 		printf("Size of file: %d\n", size);
+		fflush(stdout);
 	}
 	else{	
 		close(file);
@@ -186,8 +177,10 @@ void enterFile(char *filename, int TreasureID){
 	if(file != -1){
 		Treasure t;
 		while(read(file, &t, sizeof(Treasure)) == sizeof(Treasure)){
-			if(t.TreasureID == TreasureID)
+			if(t.TreasureID == TreasureID){
 				printf("%d %s %f %f %s %dAAA\n", t.TreasureID, t.Username, t.latitude, t.longitude, t.Cluetext, t.value);
+				fflush(stdout);
+			}
 		}
 	}
 	else{	
