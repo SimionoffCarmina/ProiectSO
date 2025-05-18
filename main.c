@@ -52,7 +52,7 @@ int main(int argc, char *argv[]){
 			char option[255];
 			int pipefd[2];
 			while(1){
-				printf("Please choose an operation:\n1)start_monitor\n2)list_hunts\n3)list_treasures\n4)view_treasure\n5)stop_monitor\n6)exit\n");
+				printf("Please choose an operation:\n1)start_monitor\n2)list_hunts\n3)list_treasures\n4)view_treasure\n5)stop_monitor\n6)calculate_score\n7)exit\n");
 				fgets(option, sizeof(option), stdin);
 				option[strcspn(option, "\n")] = 0;
 				if(strcmp(option, "start_monitor") == 0){
