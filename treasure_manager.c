@@ -39,7 +39,7 @@ void add(char h[]){
 		strcat(filename, t.Username);
 		strcat(filename, ".b");
 		int file = open(filename, O_CREAT | O_APPEND | O_WRONLY, 0644);
-		if(file != 1){
+		if(file != -1){
 			write(file, &t, sizeof(Treasure));
 		}
 		else{
@@ -55,23 +55,19 @@ void add(char h[]){
 		exit(-1);
 	}
 	closedir(dir);
+
 }
 
 int countTreasures(char *filename){
 	int nr1 = 0;
 	int file = open(filename, O_RDONLY);
-	if(file){
-		Treasure t;
-		int size = 0;
-		while(read(file, &t, sizeof(Treasure)) == sizeof(Treasure)){
-			size += sizeof(Treasure);
-			nr1++;
-		}
-	}
-	else{	
-		close(file);
-		printf("Couldn't open file");
+	if(file == -1){
+		printf("file error");
 		exit(-1);
+	}
+	Treasure t;
+	while(read(file, &t, sizeof(Treasure)) == sizeof(Treasure)){
+		nr1++;
 	}
 	close(file);
 	return nr1;
@@ -81,9 +77,9 @@ int countHunt(char h[]){
 	int nr = 0;
 	char path[255] = "./";
 	strcat(path, h);
+	
 	DIR *dir = opendir(path);
 	if(dir == NULL){
-		closedir(dir);
 		printf("Couldn't open directory");
 		exit(-1);
 	}
@@ -131,22 +127,28 @@ void listHunts(){
 
 void listFile(char *filename){
 	int file = open(filename, O_RDONLY);
-	if(file){
-		Treasure t;
-		int size = 0;
-		while(read(file, &t, sizeof(Treasure)) == sizeof(Treasure)){
-			size += sizeof(Treasure);
-			printf("%d %s %f %f %s %d\n", t.TreasureID, t.Username, t.latitude, t.longitude, t.Cluetext, t.value);
-		}
-		printf("Last time updated: %s", asctime(localtime(&t.rawtime)));
-		printf("Size of file: %d\n", size);
-		fflush(stdout);
-	}
-	else{	
-		close(file);
-		printf("Couldn't open file");
+	if(file == -1){
+		printf("Couldnt open file");
 		exit(-1);
 	}
+	
+	Treasure t;
+	int size = 0;
+	time_t last_time = 0;
+	
+	while(read(file, &t, sizeof(Treasure)) == sizeof(Treasure)) {
+		        printf("%d %s %f %f %s %d\n", t.TreasureID, t.Username, t.latitude, t.longitude, t.Cluetext, t.value);
+			size += sizeof(Treasure);
+			last_time = t.rawtime;
+	}
+	if(size > 0){
+		printf("Last time updated: %s", asctime(localtime(&last_time)));
+	}
+	else{
+		printf("No treasures found in file\n");
+	}
+	printf("Size of file: %d \n", size);
+	fflush(stdout);
 	close(file);
 }
 

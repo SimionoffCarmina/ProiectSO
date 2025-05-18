@@ -8,17 +8,26 @@ void handle_sigusr(int sig){
 		chdir("..");
 	}
 	if(sig == SIGUSR1){
-		FILE *fin = fopen("options.txt", "r");
-		int op;
-		char h[255];
-		int id;
-		if(fin == NULL){
-			printf("err");
+		int fd = open("options.txt", O_RDONLY);
+		if(fd == -1){
+			printf("Error opening file");
 			exit(-1);
 		}
-		rewind(fin);
-		fscanf(fin, "%d %s %d", &op, h, &id);
-		fclose(fin);
+		char buffer[512];
+		ssize_t n = read(fd, buffer, sizeof(buffer) - 1);
+		if (n <= 0) {
+		    perror("Error reading options.txt");
+		    close(fd);
+		    exit(EXIT_FAILURE);
+		}
+		buffer[n] = '\0'; 
+
+		close(fd);
+
+		int op, id;
+		char h[255];
+
+		sscanf(buffer, "%d %s %d", &op, h, &id);
 		if(op == 1){
 			list(h);
 		}
@@ -50,7 +59,6 @@ pid_t start_monitor(int *out_pipe){
 	}
 	if(pid == 0){
 		close(pipefd[0]);
-		
 		dup2(pipefd[1], STDOUT_FILENO);
 		close(pipefd[1]);
 		
@@ -74,18 +82,25 @@ pid_t start_monitor(int *out_pipe){
 }
 
 void stop_monitor(){
-	FILE *f = fopen("commands.txt", "r");
-	if(f == NULL){
+	int fd = open("commands.txt", O_RDONLY);
+	if(fd == -1){
 		printf("Error opening file");
 		exit(-1);
 	}
-	pid_t pid;
-	if(fscanf(f, "%d", &pid) != 1){
-		printf("error reading from file");
-		fclose(f);
+	char buf[32] = {0};
+	ssize_t n = read(fd, buf, sizeof(buf) - 1);
+	if(n <= 0){
+		printf("Error reading from file");
+		close(fd);
 		exit(-1);
 	}
-	fclose(f);
+	close(fd);
+	
+	pid_t pid = atoi(buf);
+	if(pid <= 0){
+		printf("Couldnt read");
+		exit(-1);
+	}
 	if(kill(pid, SIGTERM) == 0){
 		printf("Stopped monitor\n");
 	}
